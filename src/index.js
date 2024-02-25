@@ -87,7 +87,8 @@ class Game extends React.Component {
         super(props);
         this.state = {
             history: [{
-                squares: Array.of(9).fill(null)
+                squares: Array.of(9).fill(null),
+                positions: Array.of(9).fill(Array.of(2).fill(null))
             }],
             xIsNext: true,
             isMatchFinished: false,
@@ -105,18 +106,33 @@ class Game extends React.Component {
             this.state.isMatchFinished = true;
             status = "Winner: " + this.getCurrentValueOfThePlayer();
         }
-        if(history.length === 10 && !winner){
+        if (history.length === 10 && !winner) {
             this.state.isMatchFinished = true;
             status = "Draw";
         }
 
         const moves = history.map((step, move) => {
+
+            let pairs = [];
+            if (step.positions != null && step.positions.at(1)) {
+                for (let pair of step.positions) {
+                    pairs.push(
+                        <div key={pair}>
+                            {pair[0]} | {pair[1]}
+                        </div>
+                    );
+                }
+            }
+
             const desc = move ?
                 'Go to move # ' + move :
                 'Go to game start';
             return (
                 <li key={move}>
                     <button onClick={() => this.jumpTo(move)}>{desc}</button>
+                    <div>
+                        {pairs}
+                    </div>
                 </li>
             );
         });
@@ -142,17 +158,21 @@ class Game extends React.Component {
     };
 
     handleClick(index) {
-        const history = this.state.history.slice(0, this.state.stepNumber + 1);
         if (this.state.isMatchFinished) return;
+        const positionInMatrix = [Math.floor(index / 3), index % 3];
+        const history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const squares = current.squares.slice();
+        const positions = current.positions.slice();
+        positions.push(positionInMatrix);
         if (squares[index] != null) return;
         squares[index] = this.getNextValueOfThePlayer();
         this.setState({
             squares: squares,
             xIsNext: !this.state.xIsNext,
             history: history.concat([{
-                squares: squares
+                squares: squares,
+                positions: positions
             }]),
             stepNumber: history.length
         });
