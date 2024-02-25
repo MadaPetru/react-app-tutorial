@@ -6,23 +6,24 @@ import reportWebVitals from './reportWebVitals';
 class Board extends React.Component {
 
     render() {
+
+        const lines = 3;
+        let boardRows = [];
+
+        for (let line = 0; line < lines; line++) {
+            const boardRow = (
+                <div className="board-row" key={line}>
+                    {this.renderSquare(line * 3)}
+                    {this.renderSquare(line * 3 + 1)}
+                    {this.renderSquare(line * 3 + 2)}
+                </div>
+            );
+            boardRows.push(boardRow);
+        }
+
         return (
             <div>
-                <div className="board-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(6)}
-                    {this.renderSquare(7)}
-                    {this.renderSquare(8)}
-                </div>
+                {boardRows}
             </div>
         );
     }
