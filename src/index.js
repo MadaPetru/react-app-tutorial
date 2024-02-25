@@ -17,7 +17,6 @@ class Board extends React.Component {
                         this.renderSquareHighLighted(uniqueIndex)
                     );
                     row.push(square);
-                    console.log(1);
                 } else {
                     const square = (
                         this.renderSquare(uniqueIndex)
@@ -105,6 +104,10 @@ class Game extends React.Component {
         if (winner) {
             this.state.isMatchFinished = true;
             status = "Winner: " + this.getCurrentValueOfThePlayer();
+        }
+        if(history.length === 10 && !winner){
+            this.state.isMatchFinished = true;
+            status = "Draw";
         }
 
         const moves = history.map((step, move) => {
