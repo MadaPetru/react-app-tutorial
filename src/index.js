@@ -6,19 +6,30 @@ import reportWebVitals from './reportWebVitals';
 class Board extends React.Component {
 
     render() {
-
         const lines = 3;
         let boardRows = [];
-
         for (let line = 0; line < lines; line++) {
-            const boardRow = (
+            let row = [];
+            for (let col = 0; col < 3; col++) {
+                const uniqueIndex = line * 3 + col;
+                if (this.props.isMatchFinished && this.props.winnerSquares && this.props.winnerSquares.includes(uniqueIndex)) {
+                    const square = (
+                        this.renderSquareHighLighted(uniqueIndex)
+                    );
+                    row.push(square);
+                    console.log(1);
+                } else {
+                    const square = (
+                        this.renderSquare(uniqueIndex)
+                    );
+                    row.push(square);
+                }
+            }
+            boardRows.push(
                 <div className="board-row" key={line}>
-                    {this.renderSquare(line * 3)}
-                    {this.renderSquare(line * 3 + 1)}
-                    {this.renderSquare(line * 3 + 2)}
+                    {row}
                 </div>
             );
-            boardRows.push(boardRow);
         }
 
         return (
@@ -37,11 +48,32 @@ class Board extends React.Component {
             />
         );
     }
+
+    renderSquareHighLighted(index) {
+        return (
+            <SquareHighLighted value={this.props.squares[index]}
+                               onClick={() => {
+                                   this.props.onClick(index)
+                               }}
+            />
+        );
+    }
 }
 
 function Square(props) {
     return (
-        <button className="square"
+        <button className="square normal"
+                onClick={() => {
+                    props.onClick()
+                }}>
+            {props.value}
+        </button>
+    );
+}
+
+function SquareHighLighted(props) {
+    return (
+        <button className="square high-lighted"
                 onClick={() => {
                     props.onClick()
                 }}>
@@ -68,11 +100,11 @@ class Game extends React.Component {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
-        let nextValueOfThePlayer = this.getNextValueOfThePlayer();
-        let status = 'Next player: ' + nextValueOfThePlayer;
+        const winnerSquares = getWinnerSquares(current.squares);
+        let status = 'Next player: ' + this.getNextValueOfThePlayer();
         if (winner) {
             this.state.isMatchFinished = true;
-            status = "Winner: " + nextValueOfThePlayer;
+            status = "Winner: " + this.getCurrentValueOfThePlayer();
         }
 
         const moves = history.map((step, move) => {
@@ -90,6 +122,8 @@ class Game extends React.Component {
             <div className="game">
                 <div className="game-board">
                     <Board
+                        isMatchFinished={this.state.isMatchFinished}
+                        winnerSquares={winnerSquares}
                         squares={current.squares}
                         onClick={(index) => this.handleClick(index)}
                     />
@@ -131,6 +165,10 @@ class Game extends React.Component {
     getNextValueOfThePlayer() {
         return this.state.xIsNext ? 'X' : 'O';
     }
+
+    getCurrentValueOfThePlayer() {
+        return this.state.xIsNext ? 'O' : 'X';
+    }
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -160,6 +198,26 @@ function calculateWinner(squares) {
         const [a, b, c] = lines[i];
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
             return squares[a];
+        }
+    }
+    return null;
+}
+
+function getWinnerSquares(squares) {
+    const lines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+        const [a, b, c] = lines[i];
+        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+            return lines[i];
         }
     }
     return null;
