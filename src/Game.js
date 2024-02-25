@@ -23,11 +23,9 @@ class Game extends React.Component {
         const winnerSquares = getWinnerSquares(current.squares);
         let status = 'Next player: ' + this.getNextValueOfThePlayer();
         if (winner) {
-            this.state.isMatchFinished = true;
             status = "Winner: " + this.getCurrentValueOfThePlayer();
         }
         if (history.length === 10 && !winner) {
-            this.state.isMatchFinished = true;
             status = "Draw";
         }
 
@@ -94,7 +92,8 @@ class Game extends React.Component {
                 squares: squares,
                 positions: positions
             }]),
-            stepNumber: history.length
+            stepNumber: history.length,
+            isMatchFinished: calculateWinner(squares) != null
         });
     }
 
